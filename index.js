@@ -32,6 +32,49 @@ async function run() {
     const toyCollection = client.db('transformer').collection('toyTransformer')
 
 
+    app.post ('/uploadToy', async (req, res)=>{
+        const data = req.body;
+        console.log(data);
+        const result = await toyCollection.insertOne(data)
+        res.send(result)
+    })
+
+    app.get ('/allToys', async (req, res)=>{
+        const toys = toyCollection.find()
+        const result = await toys.toArray()
+        res.send(result)
+    })
+
+
+    app.get('/toy/:id', async (req, res)=>{        
+        const id = req.params.id;      
+        const filter = {_id: new ObjectId(id)}      
+        const data = await toyCollection.findOne(filter)
+        res.send (data)
+    })
+
+
+    app.patch('/toy/:id', async (req, res)=>{        
+        const id = req.params.id;
+        const updatedToyData = req.body        
+        const filter = {_id: new ObjectId(id)}
+        const updatedDoc = {
+            $set:{
+                ...updatedToyData
+            }
+        }
+        const result = await toyCollection.updateOne(filter, updatedDoc)
+        res.send (result)
+    })
+
+
+    app.delete('/toy/:id', async (req, res)=>{
+        const id = req.params.id;
+        const filter = {_id: new ObjectId(id)}
+        const result = await toyCollection.deleteOne(filter)
+        res.send(result)
+    
+    })
 
 
     // Send a ping to confirm a successful connection
