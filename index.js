@@ -29,7 +29,22 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-    const toyCollection = client.db('transformer').collection('toyTransformer')
+    const toyCollection = client.db('transformer').collection('toyTransformer')  
+
+    const indexKeys = {name:1}
+    const indexOptions = {name: "toyName"}
+    const result = await toyCollection.createIndex(indexKeys, indexOptions)
+    console.log(result);
+
+    app.get ("/searchToy/:text", async (req, res)=>{
+    const text = req.params.text;
+    const result = await toyCollection.find({
+      $or: [
+        {name: {$regex: text, $options:"i"}}
+      ]
+    }).toArray()
+    res.send (result)
+    })
 
 
     app.post ('/uploadToy', async (req, res)=>{
@@ -49,8 +64,8 @@ async function run() {
     app.get('/toy/:id', async (req, res)=>{        
         const id = req.params.id;      
         const filter = {_id: new ObjectId(id)}      
-        const data = await toyCollection.findOne(filter)
-        res.send (data)
+        const result = await toyCollection.findOne(filter)
+        res.send (result)
     })
 
 
@@ -76,8 +91,13 @@ async function run() {
     
     })
 
+    app.get ('/myToys/:email', async (req, res)=>{
+      console.log(req.params.email);
+      const result = await toyCollection.find({sellerEmail: req.params.email}).toArray();
+      res.send(result)
+    })
 
-    // Send a ping to confirm a successful connection
+        // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
