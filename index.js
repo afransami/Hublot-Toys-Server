@@ -27,8 +27,13 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // Connect the client to the server	(optional starting in v4.7)    
+    client.connect((err)=>{
+    if(err) {
+      console.error(err);
+      return;
+    }
+    })
     const toyCollection = client.db('transformer').collection('toyTransformer')  
 
     const indexKeys = {name:1}
@@ -97,6 +102,19 @@ async function run() {
       const result = await toyCollection.find({sellerEmail: req.params.email}).toArray();
       res.send(result)
     })
+
+
+    app.get ('/category', async (req, res)=>{
+      console.log(req.query.subCategory);
+      let query = {};
+      if (req.query.subCategory){
+        query= {subCategory: req.query.subCategory}
+      }
+        const result = await toyCollection.find(query).toArray()
+        res.send(result)
+    })
+
+
 
         // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
