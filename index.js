@@ -49,6 +49,12 @@ async function run() {
     res.send (result)
     })
 
+    app.get ('/allToys', async (req, res)=>{     
+      const toys = toyCollection.find().limit(20)
+      const result = await toys.toArray()
+      res.send(result)
+  })
+
 
     app.post ('/uploadToy', async (req, res)=>{
         const data = req.body;
@@ -56,13 +62,7 @@ async function run() {
         const result = await toyCollection.insertOne(data)
         res.send(result)
     })
-
-    app.get ('/allToys', async (req, res)=>{     
-        const toys = toyCollection.find().limit(20)
-        const result = await toys.toArray()
-        res.send(result)
-    })
-
+  
 
     app.get('/toy/:id', async (req, res)=>{        
         const id = req.params.id;      
