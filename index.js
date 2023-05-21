@@ -26,12 +26,18 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)    
-    client.connect((err)=>{
-    if(err) {
-      console.error(err);
-      return;
-    }
-    })
+    
+    client.connect(err => {
+      if (err) {
+        console.error('Failed to connect to MongoDB:', err);
+        process.exit(1);
+      }
+    
+      console.log('Connected to MongoDB');
+    
+      db = client.db();
+    });
+
     const toyCollection = client.db('transformer').collection('toyTransformer')  
 
     const indexKeys = {name:1}
